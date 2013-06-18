@@ -5,6 +5,7 @@
 //  Copyright 2011 Markus Emrich. All rights reserved.
 //
 
+#import "JDCompatibility.h"
 
 @protocol JDFlipNumberDigitViewDelegate;
 
@@ -17,7 +18,7 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationType) {
 typedef void(^JDDigitAnimationCompletionBlock)(BOOL finished);
 
 
-@interface JDFlipNumberDigitView : UIView
+@interface JDFlipNumberDigitView : JDView
 
 @property (nonatomic, assign) CGFloat animationDuration;
 @property (nonatomic, assign) NSUInteger value;

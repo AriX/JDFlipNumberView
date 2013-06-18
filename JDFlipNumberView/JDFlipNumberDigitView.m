@@ -25,9 +25,9 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 
 
 @interface JDFlipNumberDigitView ()
-@property (nonatomic, strong) UIImageView *topImageView;
-@property (nonatomic, strong) UIImageView *flipImageView;
-@property (nonatomic, strong) UIImageView *bottomImageView;
+@property (nonatomic, strong) JDImageView *topImageView;
+@property (nonatomic, strong) JDImageView *flipImageView;
+@property (nonatomic, strong) JDImageView *bottomImageView;
 @property (nonatomic, assign) JDFlipAnimationState animationState;
 @property (nonatomic, assign) JDFlipAnimationType animationType;
 @property (nonatomic, assign) NSUInteger previousValue;
@@ -59,9 +59,11 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 - (void)commonInit;
 {
     // setup view
+#if TARGET_OS_IPHONE
     self.backgroundColor = [UIColor clearColor];
+#endif
     self.autoresizesSubviews = NO;
-    self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+    self.autoresizingMask = JDViewAutoresizingFlexibleTopMargin | JDViewAutoresizingFlexibleLeftMargin | JDViewAutoresizingFlexibleBottomMargin | JDViewAutoresizingFlexibleRightMargin;
     
     // default values
     _value = 0;
@@ -75,9 +77,14 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 - (void)initImagesAndFrames;
 {
 	// setup image views
-	self.topImageView	 = [[UIImageView alloc] initWithImage: JD_IMG_FACTORY.topImages[0]];
-	self.flipImageView	 = [[UIImageView alloc] initWithImage: JD_IMG_FACTORY.topImages[0]];
-	self.bottomImageView = [[UIImageView alloc] initWithImage: JD_IMG_FACTORY.bottomImages[0]];
+	self.topImageView	 = [[JDImageView alloc] init];
+	self.flipImageView	 = [[JDImageView alloc] init];
+	self.bottomImageView = [[JDImageView alloc] init];
+    
+    self.topImageView.image = JD_IMG_FACTORY.topImages[0];
+    self.flipImageView.image = JD_IMG_FACTORY.topImages[0];
+    self.bottomImageView.image = JD_IMG_FACTORY.bottomImages[0];
+    
     self.flipImageView.hidden = YES;
 	
 	self.bottomImageView.frame = CGRectMake(0, JD_IMG_FACTORY.imageSize.height,

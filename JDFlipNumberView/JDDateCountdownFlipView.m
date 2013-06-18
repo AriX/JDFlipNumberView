@@ -43,9 +43,11 @@ static CGFloat kFlipAnimationUpdateInterval = 0.5; // = 2 times per second
     if (self) {
         _dayDigitCount = dayDigits;
         // view setup
+#if TARGET_OS_IPHONE
         self.backgroundColor = [UIColor clearColor];
+#endif
         self.autoresizesSubviews = NO;
-        self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+        self.autoresizingMask = JDViewAutoresizingFlexibleTopMargin | JDViewAutoresizingFlexibleLeftMargin | JDViewAutoresizingFlexibleBottomMargin | JDViewAutoresizingFlexibleRightMargin;
 		
         // setup flipviews
         self.dayFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:_dayDigitCount];

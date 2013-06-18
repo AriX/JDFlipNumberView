@@ -7,6 +7,7 @@
 //
 
 #import "JDFlipNumberViewImageFactory.h"
+#import "JDCompatibility.h"
 
 static JDFlipNumberViewImageFactory *sharedInstance;
 
@@ -51,11 +52,13 @@ static JDFlipNumberViewImageFactory *sharedInstance;
     // create default images
     [self generateImagesFromBundleNamed:self.imageBundle];
     
+#if TARGET_OS_IPHONE
     // register for memory warnings
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReceiveMemoryWarning:)
                                                  name:UIApplicationDidReceiveMemoryWarningNotification
                                                object:nil];
+#endif
 }
 
 + (id)allocWithZone:(NSZone *)zone;
@@ -95,7 +98,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 
 - (CGSize)imageSize
 {
-    return ((UIImage*)self.topImages[0]).size;
+    return ((JDImage*)self.topImages[0]).size;
 }
 
 #pragma mark -
@@ -110,20 +113,27 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 	// create bottom and top images
     for (NSInteger j=0; j<10; j++) {
         for (int i=0; i<2; i++) {
-            NSString *imageName = [NSString stringWithFormat: @"%d.png", j];
+            NSString *imageName = [NSString stringWithFormat: @"%ld.png", (long)j];
             NSString *bundleImageName = [NSString stringWithFormat: @"%@.bundle/%@", bundleName, imageName];
             NSString *path = [[NSBundle mainBundle] pathForResource:bundleImageName ofType:nil];
-			UIImage *sourceImage = [[UIImage alloc] initWithContentsOfFile:path];
+			JDImage *sourceImage = [[JDImage alloc] initWithContentsOfFile:path];
 			CGSize size		= CGSizeMake(sourceImage.size.width, sourceImage.size.height/2);
 			CGFloat yPoint	= (i==0) ? 0 : -size.height;
 			
             NSAssert(sourceImage != nil, @"Did not find image %@.png in bundle %@.bundle", imageName, bundleName);
             
             // draw half of image and create new image
+#if TARGET_OS_IPHONE
 			UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
 			[sourceImage drawAtPoint:CGPointMake(0,yPoint)];
 			UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
 			UIGraphicsEndImageContext();
+#else
+            NSImage *image = [[NSImage alloc] initWithSize:size];
+            [image lockFocus];
+            [sourceImage drawAtPoint:CGPointMake(0,yPoint) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+            [image unlockFocus];
+#endif
             
             // save image
             if (i==0) {

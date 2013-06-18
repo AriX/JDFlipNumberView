@@ -5,13 +5,13 @@
 //  Copyright 2011 Markus Emrich. All rights reserved.
 //
 
-
+#import "JDCompatibility.h"
 
 @protocol JDFlipNumberViewDelegate;
 
 typedef void(^JDFlipAnimationCompletionBlock)(BOOL finished);
 
-@interface JDFlipNumberView : UIView
+@interface JDFlipNumberView : JDView
 
 @property (nonatomic, weak) id<JDFlipNumberViewDelegate> delegate;
 @property (nonatomic, assign) NSInteger value;
