@@ -80,6 +80,13 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 	self.topImageView	 = [[JDImageView alloc] init];
 	self.flipImageView	 = [[JDImageView alloc] init];
 	self.bottomImageView = [[JDImageView alloc] init];
+
+#if !TARGET_OS_IPHONE
+    self.wantsLayer = YES;
+    self.topImageView.wantsLayer = YES;
+    self.flipImageView.wantsLayer = YES;
+	self.bottomImageView.wantsLayer = YES;
+#endif
     
     self.topImageView.image = JD_IMG_FACTORY.topImages[0];
     self.flipImageView.image = JD_IMG_FACTORY.topImages[0];
@@ -142,9 +149,17 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
     // update imageView frames
     rect.origin = CGPointMake(0, 0);
     rect.size.height /= 2.0;
+#if TARGET_OS_IPHONE
     self.topImageView.frame = rect;
-    rect.origin.y += rect.size.height;
+#else
     self.bottomImageView.frame = rect;
+#endif
+    rect.origin.y += rect.size.height;
+#if TARGET_OS_IPHONE
+    self.bottomImageView.frame = rect;
+#else
+    self.topImageView.frame = rect;
+#endif
 
     // update flip imageView frame
     BOOL isFirstHalf = (self.animationState == JDFlipAnimationStateFirstHalf);
@@ -235,8 +250,13 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
         self.flipImageView.image   = isTopDown ? JD_IMG_FACTORY.topImages[self.previousValue] : JD_IMG_FACTORY.bottomImages[self.previousValue];
         self.bottomImageView.image = JD_IMG_FACTORY.bottomImages[isTopDown ? self.previousValue : self.value];
 		
+#if TARGET_OS_IPHONE
+        CGFloat angle = (isTopDown ?- M_PI_2 : M_PI_2);
+#else
+        CGFloat angle = (!isTopDown ? -M_PI_2 : M_PI_2);
+#endif
         animation.fromValue	= [NSValue valueWithCATransform3D:CATransform3DMakeRotation(0.0, 1, 0, 0)];
-        animation.toValue   = [NSValue valueWithCATransform3D:CATransform3DMakeRotation(isTopDown ? -M_PI_2 : M_PI_2, 1, 0, 0)];
+        animation.toValue   = [NSValue valueWithCATransform3D:CATransform3DMakeRotation(angle, 1, 0, 0)];
 		animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
 	} else {
 		// setup second animation half
@@ -246,7 +266,12 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
             self.flipImageView.image = JD_IMG_FACTORY.topImages[self.value];
         }
         
-		animation.fromValue	= [NSValue valueWithCATransform3D:CATransform3DMakeRotation(isTopDown ? M_PI_2 : -M_PI_2, 1, 0, 0)];
+#if TARGET_OS_IPHONE
+        CGFloat angle = (isTopDown ? M_PI_2 : -M_PI_2);
+#else
+        CGFloat angle = (!isTopDown ? M_PI_2 : -M_PI_2);
+#endif
+		animation.fromValue	= [NSValue valueWithCATransform3D:CATransform3DMakeRotation(angle, 1, 0, 0)];
 		animation.toValue   = [NSValue valueWithCATransform3D:CATransform3DMakeRotation(0.0, 1, 0, 0)];
 		animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
 	}
@@ -299,11 +324,20 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 {
     if ((self.animationType == JDFlipAnimationTypeTopDown && self.animationState == JDFlipAnimationStateFirstHalf) ||
         (self.animationType == JDFlipAnimationTypeBottomUp && self.animationState == JDFlipAnimationStateSecondHalf)) {
-		self.flipImageView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+#if TARGET_OS_IPHONE
+        self.flipImageView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+#else
+        self.flipImageView.layer.anchorPoint = CGPointMake(0.0, 0.0);
+#endif
 		self.flipImageView.frame = self.topImageView.frame;
 	} else {
-		self.flipImageView.layer.anchorPoint = CGPointMake(0.5, 0.0);
+#if TARGET_OS_IPHONE
+        self.flipImageView.layer.anchorPoint = CGPointMake(0.5, 0.0);
 		self.flipImageView.frame = self.bottomImageView.frame;
+#else
+        self.flipImageView.layer.anchorPoint = CGPointMake(0.0, 1.0);
+		self.flipImageView.frame = self.topImageView.frame;
+#endif
 	}
 }
 

@@ -116,17 +116,18 @@ static JDFlipNumberViewImageFactory *sharedInstance;
             NSString *imageName = [NSString stringWithFormat: @"%@%ld", prefix, (long)j];
 			JDImage *sourceImage = [JDImage imageNamed:imageName];
 			CGSize size		= CGSizeMake(sourceImage.size.width, sourceImage.size.height/2);
-			CGFloat yPoint	= (i==0) ? 0 : -size.height;
 			
             NSAssert(sourceImage != nil, @"Did not find image %@", imageName);
             
             // draw half of image and create new image
 #if TARGET_OS_IPHONE
+            CGFloat yPoint	= (i==0) ? 0 : -size.height;
 			UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
 			[sourceImage drawAtPoint:CGPointMake(0,yPoint)];
 			UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
 			UIGraphicsEndImageContext();
 #else
+            CGFloat yPoint	= (i!=0) ? 0 : -size.height;
             NSImage *image = [[NSImage alloc] initWithSize:size];
             [image lockFocus];
             [sourceImage drawAtPoint:CGPointMake(0,yPoint) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
