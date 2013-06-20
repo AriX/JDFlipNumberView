@@ -18,6 +18,6 @@
 @property (nonatomic, readonly) CGSize imageSize;
 
 + (JDFlipNumberViewImageFactory*)sharedInstance;
-- (void)generateImagesFromBundleNamed:(NSString*)bundleName;
+- (void)generateImagesWithPrefix:(NSString*)bundleName;
 
 @end

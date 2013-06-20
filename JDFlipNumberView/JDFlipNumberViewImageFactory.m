@@ -14,7 +14,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 @interface JDFlipNumberViewImageFactory ()
 @property (nonatomic, strong) NSArray *topImages;
 @property (nonatomic, strong) NSArray *bottomImages;
-@property (nonatomic, strong) NSString *imageBundle;
+@property (nonatomic, strong) NSString *imagePrefix;
 - (void)setup;
 @end
 
@@ -40,7 +40,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
         self = [super init];
         if (self) {
             sharedInstance = self;
-            self.imageBundle = @"JDFlipNumberView";
+            self.imagePrefix = @"JDFlipNumberView";
             [self setup];
         }
         return self;
@@ -50,7 +50,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 - (void)setup;
 {
     // create default images
-    [self generateImagesFromBundleNamed:self.imageBundle];
+    [self generateImagesWithPrefix:self.imagePrefix];
     
 #if TARGET_OS_IPHONE
     // register for memory warnings
@@ -77,7 +77,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
     @synchronized(self)
     {
         if (_topImages.count == 0) {
-            [self generateImagesFromBundleNamed:self.imageBundle];
+            [self generateImagesWithPrefix:self.imagePrefix];
         }
         
         return _topImages;
@@ -89,7 +89,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
     @synchronized(self)
     {
         if (_bottomImages.count == 0) {
-            [self generateImagesFromBundleNamed:self.imageBundle];
+            [self generateImagesWithPrefix:self.imagePrefix];
         }
         
         return _bottomImages;
@@ -103,9 +103,9 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 
 #pragma mark -
 #pragma mark image generation
-- (void)generateImagesFromBundleNamed:(NSString*)bundleName;
+- (void)generateImagesWithPrefix:(NSString*)prefix;
 {
-    self.imageBundle = bundleName;
+    self.imagePrefix = prefix;
     // create image array
 	NSMutableArray* topImages = [NSMutableArray arrayWithCapacity:10];
 	NSMutableArray* bottomImages = [NSMutableArray arrayWithCapacity:10];
@@ -113,14 +113,12 @@ static JDFlipNumberViewImageFactory *sharedInstance;
 	// create bottom and top images
     for (NSInteger j=0; j<10; j++) {
         for (int i=0; i<2; i++) {
-            NSString *imageName = [NSString stringWithFormat: @"%ld.png", (long)j];
-            NSString *bundleImageName = [NSString stringWithFormat: @"%@.bundle/%@", bundleName, imageName];
-            NSString *path = [[NSBundle mainBundle] pathForResource:bundleImageName ofType:nil];
-			JDImage *sourceImage = [[JDImage alloc] initWithContentsOfFile:path];
+            NSString *imageName = [NSString stringWithFormat: @"%@%ld", prefix, (long)j];
+			JDImage *sourceImage = [JDImage imageNamed:imageName];
 			CGSize size		= CGSizeMake(sourceImage.size.width, sourceImage.size.height/2);
 			CGFloat yPoint	= (i==0) ? 0 : -size.height;
 			
-            NSAssert(sourceImage != nil, @"Did not find image %@.png in bundle %@.bundle", imageName, bundleName);
+            NSAssert(sourceImage != nil, @"Did not find image %@", imageName);
             
             // draw half of image and create new image
 #if TARGET_OS_IPHONE
