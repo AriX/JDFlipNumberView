@@ -39,12 +39,22 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
 
 - (id)init;
 {
-	return [self initWithDigitCount:1];
+	return [self initWithDigitCount:2];
+}
+
+- (id)initWithFrame:(CGRect)frame;
+{
+    return [self initWithDigitCount:2 frame:frame];
 }
 
 - (id)initWithDigitCount:(NSUInteger)digitCount;
 {
-    self = [super initWithFrame:CGRectZero];
+    return [self initWithDigitCount:digitCount frame:CGRectZero];
+}
+
+- (id)initWithDigitCount:(NSUInteger)digitCount frame:(CGRect)frame;
+{
+    self = [super initWithFrame:frame];
     if (self)
 	{
 #if TARGET_OS_IPHONE
@@ -69,7 +79,9 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
         self.animationType = JDFlipAnimationTypeTopDown;
         self.maximumValue = pow(10, digitCount)-1;
         self.targetMode = NO;
-		super.frame = CGRectMake(0, 0, digitCount*view.frame.size.width, view.frame.size.height);
+        
+        if (CGRectIsEmpty(frame))
+            super.frame = CGRectMake(0, 0, digitCount*view.frame.size.width, view.frame.size.height);
     }
     return self;
 }
