@@ -11,7 +11,7 @@
 
 @interface JDDateCountdownFlipView : JDView
 
-@property (nonatomic, strong) NSDate *targetDate;
+@property (nonatomic, retain) NSDate *targetDate;
 
 - (id)initWithDayDigitCount:(NSInteger)dayDigits;
 

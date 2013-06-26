@@ -11,12 +11,12 @@ static CGFloat kFlipAnimationUpdateInterval = 0.5; // = 2 times per second
 
 @interface JDDateCountdownFlipView ()
 @property (nonatomic) NSInteger dayDigitCount;
-@property (nonatomic, strong) JDFlipNumberView* dayFlipNumberView;
-@property (nonatomic, strong) JDFlipNumberView* hourFlipNumberView;
-@property (nonatomic, strong) JDFlipNumberView* minuteFlipNumberView;
-@property (nonatomic, strong) JDFlipNumberView* secondFlipNumberView;
+@property (nonatomic, assign) JDFlipNumberView* dayFlipNumberView;
+@property (nonatomic, assign) JDFlipNumberView* hourFlipNumberView;
+@property (nonatomic, assign) JDFlipNumberView* minuteFlipNumberView;
+@property (nonatomic, assign) JDFlipNumberView* secondFlipNumberView;
 
-@property (nonatomic, strong) NSTimer *animationTimer;
+@property (nonatomic, retain) NSTimer *animationTimer;
 - (void)setupUpdateTimer;
 - (void)handleTimer:(NSTimer*)timer;
 @end
@@ -50,31 +50,49 @@ static CGFloat kFlipAnimationUpdateInterval = 0.5; // = 2 times per second
         self.autoresizingMask = JDViewAutoresizingFlexibleTopMargin | JDViewAutoresizingFlexibleLeftMargin | JDViewAutoresizingFlexibleBottomMargin | JDViewAutoresizingFlexibleRightMargin;
 		
         // setup flipviews
-        self.dayFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:_dayDigitCount];
-        self.hourFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
-        self.minuteFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
-        self.secondFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
+        JDFlipNumberView *dayFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:_dayDigitCount];
+        JDFlipNumberView *hourFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
+        JDFlipNumberView *minuteFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
+        JDFlipNumberView *secondFlipNumberView = [[JDFlipNumberView alloc] initWithDigitCount:2];
         
-        self.hourFlipNumberView.maximumValue = 23;
-        self.minuteFlipNumberView.maximumValue = 59;
-        self.secondFlipNumberView.maximumValue = 59;
+        hourFlipNumberView.maximumValue = 23;
+        minuteFlipNumberView.maximumValue = 59;
+        secondFlipNumberView.maximumValue = 59;
 
         [self setZDistance: 60];
         
         // set inital frame
-        CGRect frame = self.hourFlipNumberView.frame;
+        CGRect frame = hourFlipNumberView.frame;
         self.frame = CGRectMake(0, 0, frame.size.width*(dayDigits+7), frame.size.height);
         
         // add subviews
-        for (JDFlipNumberView* view in @[self.dayFlipNumberView, self.hourFlipNumberView, self.minuteFlipNumberView, self.secondFlipNumberView]) {
-            [self addSubview:view];
-        }
+        [self addSubview:dayFlipNumberView];
+        [self addSubview:hourFlipNumberView];
+        [self addSubview:minuteFlipNumberView];
+        [self addSubview:secondFlipNumberView];
+        
+        self.dayFlipNumberView = dayFlipNumberView;
+        self.hourFlipNumberView = hourFlipNumberView;
+        self.minuteFlipNumberView = minuteFlipNumberView;
+        self.secondFlipNumberView = secondFlipNumberView;
+        
+        [dayFlipNumberView release];
+        [hourFlipNumberView release];
+        [minuteFlipNumberView release];
+        [secondFlipNumberView release];
         
         // set inital dates
         self.targetDate = [NSDate date];
         [self setupUpdateTimer];
     }
     return self;
+}
+
+- (void)dealloc {
+    [_targetDate release];
+    [_animationTimer release];
+    
+    [super dealloc];
 }
 
 #pragma mark setter

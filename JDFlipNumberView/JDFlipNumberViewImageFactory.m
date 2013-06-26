@@ -12,9 +12,9 @@
 static JDFlipNumberViewImageFactory *sharedInstance;
 
 @interface JDFlipNumberViewImageFactory ()
-@property (nonatomic, strong) NSArray *topImages;
-@property (nonatomic, strong) NSArray *bottomImages;
-@property (nonatomic, strong) NSString *imagePrefix;
+@property (nonatomic, retain) NSArray *topImages;
+@property (nonatomic, retain) NSArray *bottomImages;
+@property (nonatomic, retain) NSString *imagePrefix;
 - (void)setup;
 @end
 
@@ -45,6 +45,18 @@ static JDFlipNumberViewImageFactory *sharedInstance;
         }
         return self;
     }
+}
+
+- (void)dealloc {
+    [_topImages release];
+    [_bottomImages release];
+    [_imagePrefix release];
+
+#if TARGET_OS_IPHONE
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+#endif
+
+    [super dealloc];
 }
 
 - (void)setup;
@@ -132,6 +144,7 @@ static JDFlipNumberViewImageFactory *sharedInstance;
             [image lockFocus];
             [sourceImage drawAtPoint:CGPointMake(0,yPoint) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
             [image unlockFocus];
+            [image autorelease];
 #endif
             
             // save image

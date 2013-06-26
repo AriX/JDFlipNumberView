@@ -13,7 +13,7 @@ typedef void(^JDFlipAnimationCompletionBlock)(BOOL finished);
 
 @interface JDFlipNumberView : JDView
 
-@property (nonatomic, weak) id<JDFlipNumberViewDelegate> delegate;
+@property (nonatomic, assign) id<JDFlipNumberViewDelegate> delegate;
 @property (nonatomic, assign) NSInteger value;
 @property (nonatomic, assign) NSUInteger maximumValue;
 @property (nonatomic, assign) CGFloat animationDuration;

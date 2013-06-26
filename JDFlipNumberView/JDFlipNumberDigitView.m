@@ -25,9 +25,9 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 
 
 @interface JDFlipNumberDigitView ()
-@property (nonatomic, strong) JDImageView *topImageView;
-@property (nonatomic, strong) JDImageView *flipImageView;
-@property (nonatomic, strong) JDImageView *bottomImageView;
+@property (nonatomic, assign) JDImageView *topImageView;
+@property (nonatomic, assign) JDImageView *flipImageView;
+@property (nonatomic, assign) JDImageView *bottomImageView;
 @property (nonatomic, assign) JDFlipAnimationState animationState;
 @property (nonatomic, assign) JDFlipAnimationType animationType;
 @property (nonatomic, assign) NSUInteger previousValue;
@@ -49,6 +49,12 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
         [self commonInit];
     }
     return self;
+}
+
+- (void)dealloc {
+    [_completionBlock release];
+    
+    [super dealloc];
 }
 
 - (void)awakeFromNib;
@@ -76,32 +82,40 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationState) {
 
 - (void)initImagesAndFrames;
 {
-	// setup image views
-	self.topImageView	 = [[JDImageView alloc] init];
-	self.flipImageView	 = [[JDImageView alloc] init];
-	self.bottomImageView = [[JDImageView alloc] init];
+    // setup image views
+    JDImageView *topImageView = [[JDImageView alloc] init];
+    JDImageView *flipImageView = [[JDImageView alloc] init];
+    JDImageView *bottomImageView = [[JDImageView alloc] init];
 
 #if !TARGET_OS_IPHONE
     self.wantsLayer = YES;
-    self.topImageView.wantsLayer = YES;
-    self.flipImageView.wantsLayer = YES;
-	self.bottomImageView.wantsLayer = YES;
+    topImageView.wantsLayer = YES;
+    flipImageView.wantsLayer = YES;
+	bottomImageView.wantsLayer = YES;
 #endif
     
-    self.topImageView.image = JD_IMG_FACTORY.topImages[0];
-    self.flipImageView.image = JD_IMG_FACTORY.topImages[0];
-    self.bottomImageView.image = JD_IMG_FACTORY.bottomImages[0];
+    topImageView.image = JD_IMG_FACTORY.topImages[0];
+    flipImageView.image = JD_IMG_FACTORY.topImages[0];
+    bottomImageView.image = JD_IMG_FACTORY.bottomImages[0];
     
-    self.flipImageView.hidden = YES;
+    flipImageView.hidden = YES;
 	
-	self.bottomImageView.frame = CGRectMake(0, JD_IMG_FACTORY.imageSize.height,
+	bottomImageView.frame = CGRectMake(0, JD_IMG_FACTORY.imageSize.height,
                                             JD_IMG_FACTORY.imageSize.width,
                                             JD_IMG_FACTORY.imageSize.height);
 	
 	// add image views
-	[self addSubview:self.topImageView];
-	[self addSubview:self.bottomImageView];
-	[self addSubview:self.flipImageView];
+	[self addSubview:topImageView];
+	[self addSubview:bottomImageView];
+	[self addSubview:flipImageView];
+    
+    self.topImageView = topImageView;
+	self.flipImageView = flipImageView;
+	self.bottomImageView = bottomImageView;
+    
+    [topImageView release];
+    [flipImageView release];
+    [bottomImageView release];
 	
 	// setup default 3d transform
 	[self setZDistance: (JD_IMG_FACTORY.imageSize.height*2)*3];

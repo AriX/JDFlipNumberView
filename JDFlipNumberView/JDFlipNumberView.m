@@ -20,10 +20,10 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
 };
 
 @interface JDFlipNumberView ()
-@property (nonatomic, strong) NSArray *digitViews;
+@property (nonatomic, copy) NSArray *digitViews;
 @property (nonatomic, assign) JDFlipAnimationType animationType;
 
-@property (nonatomic, strong) NSTimer *animationTimer;
+@property (nonatomic, retain) NSTimer *animationTimer;
 @property (nonatomic, assign) NSTimeInterval neededInterval;
 @property (nonatomic, assign) NSTimeInterval intervalRest;
 @property (nonatomic, assign) BOOL targetMode;
@@ -72,8 +72,10 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
 			view.frame = CGRectMake(i*view.frame.size.width, 0, view.frame.size.width, view.frame.size.height);
 			[self addSubview: view];
 			[allViews addObject: view];
+            [view release];
 		}
-		self.digitViews = [[NSArray alloc] initWithArray: allViews];
+		self.digitViews = allViews;
+        [allViews release];
         
         // setup properties
         self.animationType = JDFlipAnimationTypeTopDown;
@@ -86,6 +88,14 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
     return self;
 }
 
+- (void)dealloc {
+    [_animationTimer release];
+    [_digitViews release];
+    [_animationTimer release];
+    [_completionBlock release];
+    
+    [super dealloc];
+}
 
 #pragma mark -
 #pragma mark external access
@@ -355,10 +365,10 @@ typedef NS_OPTIONS(NSUInteger, JDFlipAnimationDirection) {
     }
     
 	self.targetMode = NO;
-    [self.animationTimer invalidate];
-    self.animationTimer = nil;
     self.intervalRest = 0;
     self.completionBlock = nil;
+    [self.animationTimer invalidate];
+    self.animationTimer = nil;
 }
 
 #pragma mark -

@@ -12,8 +12,8 @@
 
 @interface JDFlipNumberViewImageFactory : NSObject
 
-@property (nonatomic, strong, readonly) NSArray *topImages;
-@property (nonatomic, strong, readonly) NSArray *bottomImages;
+@property (nonatomic, retain, readonly) NSArray *topImages;
+@property (nonatomic, retain, readonly) NSArray *bottomImages;
 
 @property (nonatomic, readonly) CGSize imageSize;
 
