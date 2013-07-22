@@ -21,6 +21,7 @@ typedef void(^JDFlipAnimationCompletionBlock)(BOOL finished);
 
 
 - (id)initWithDigitCount:(NSUInteger)digitCount;
+- (id)initWithDigitCount:(NSUInteger)digitCount frame:(CGRect)frame;
 
 - (void)setZDistance:(NSUInteger)zDistance;
 
